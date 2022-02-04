@@ -1,56 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
-
-const useFullScreen = (callback) => {
-  const element = useRef();
-
-  const runCb = (isFull) => {
-    if (callback && typeof callback === "function") {
-      callback(isFull);
-    }
-  };
-  const triggerFull = () => {
-    if (element.current) {
-      if (element.current.requestFullscreen) {
-        element.current.requestFullscreen();
-      } else if (element.current.mozRequestFullScreen) {
-        element.current.mozRequestFullScreen();
-      } else if (element.current.webkitRequestFullscreen) {
-        element.current.webkitRequestFullscreen();
-      } else if (element.current.msRequestFullscreen) {
-        element.current.msRequestFullscreen();
-      }
-      runCb(true);
-    }
-  };
-  const exitFull = () => {
-    document.exitFullscreen();
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-    runCb(false);
-  };
-  return { element, triggerFull, exitFull };
-};
-
+import useAxios from "./useAxios";
 const App = () => {
-  const onFullS = (isFull) => {
-    console.log(isFull ? "full" : "small");
-  };
-  const { element, triggerFull, exitFull } = useFullScreen(onFullS);
+  const { loading, data, error, refetch } = useAxios({
+    url: "https://yts.mx/api/v2/list_movies.json"
+  });
+  // console.log(
+  //   `loading:${loading},\n data:${JSON.stringify(data)}, \n error:${error}`
+  // );
   return (
     <div className="App" style={{ height: "1000vh" }}>
-      <div ref={element}>
-        <img src="https://i.ibb.co/R6RwNxx/grape.jpg" alt="grape" width="250" />
-        <button onClick={exitFull}>make full</button>
-      </div>
-      <button onClick={triggerFull}>make full</button>
+      <h1>{data && data.status}</h1>
+      <h1>{loading ? "Loading" : "done"}</h1>
+      <button onClick={refetch}>refetch</button>
     </div>
   );
 };
